@@ -144,25 +144,28 @@ fn footprint_latitude(e1: f64, mu: f64) -> f64 {
 const K0: f64 = 0.9996;
 const E: f64 = 0.00669438;
 
-#[cfg(feature = "std")]
-impl std::error::Error for WSG84ToLatLonError {
-    fn description(&self) -> &str {
-        match self {
-            WSG84ToLatLonError::EastingOutOfRange => {
-                "Easting out of range, must be between 100000 and 999999"
+#[cfg(not(feature = "no_std"))]
+impl std::fmt::Display for WSG84ToLatLonError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                WSG84ToLatLonError::EastingOutOfRange =>
+                    "Easting out of range, must be between 100000 and 999999",
+                WSG84ToLatLonError::NorthingOutOfRange =>
+                    "Northing out of range, must be between 0 and 10000000",
+                WSG84ToLatLonError::ZoneNumOutOfRange =>
+                    "Zone num out of range, must be between 1 and 60",
+                WSG84ToLatLonError::ZoneLetterOutOfRange =>
+                    "Zone letter out of range, must be between C and X",
             }
-            WSG84ToLatLonError::NorthingOutOfRange => {
-                "Northing out of range, must be between 0 and 10000000"
-            }
-            WSG84ToLatLonError::ZoneNumOutOfRange => {
-                "Zone num out of range, must be between 1 and 60"
-            }
-            WSG84ToLatLonError::ZoneLetterOutOfRange => {
-                "Zone letter out of range, must be between C and X"
-            }
-        }
+        )
     }
 }
+
+#[cfg(not(feature = "no_std"))]
+impl std::error::Error for WSG84ToLatLonError {}
 
 #[derive(Debug, PartialEq)]
 /// Error type for the wsg84_utm_to_lat_lon function.
